@@ -306,4 +306,151 @@
         if (!link.trim()) return setError("Please add a public video link.");
         setEntries([...entries, { name: name.trim(), timeInput: timeInput.trim(), link: link.trim() }]);
         setSuccess("Submitted! You're on the board. (Local demo storage.)");
-        setName(""); setTimeInput(""); set
+        setName(""); setTimeInput(""); setLink("");
+        setCelebrate(true); setTimeout(() => setCelebrate(false), 2500);
+      }
+
+      const featured = sorted[featuredIndex] || null;
+
+      return (
+        <div className="min-h-screen text-white relative overflow-hidden" style={{ background: "linear-gradient(180deg,#020409,#0a0f14 40%,#0b0e12)" }}>
+          <style>{`
+            @keyframes floaty {0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+            @keyframes wobble {0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+            @keyframes marquee {0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+            .animate-floaty{animation:floaty 4s ease-in-out infinite}
+            .animate-wobble:hover{animation:wobble .6s ease-in-out}
+            .animate-marquee{animation:marquee 16s linear infinite}
+          `}</style>
+
+          <NodeNetBG />
+
+          <header className="relative">
+            <div className="mx-auto max-w-6xl px-4 pt-10 pb-6">
+              <div className="flex items-center gap-3">
+                <img src="https://cdn.shopify.com/s/files/1/0630/6889/7494/files/eyes-3inch-red.png?v=1742844664"
+                     alt="Drippy Logo" className="w-12 h-12 object-contain animate-floaty animate-wobble" />
+                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-lime-300 via-white to-pink-300 bg-clip-text text-transparent">
+                  Drippy Rubix Cube Leaderboard
+                </h1>
+              </div>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Sticker>🚀 SF startup polish</Sticker>
+                <Sticker>💚 Lime × 💖 Pink</Sticker>
+                <Sticker>🧩 Speedrun vibes</Sticker>
+              </div>
+              <p className="mt-3 max-w-2xl text-white/75">
+                Sip, solve, send it. Post your best time and link your video from Instagram, TikTok, or X (Twitter).
+                Fastest solves float to the top—like fizz.
+              </p>
+            </div>
+            <div className="mx-auto max-w-6xl px-4 pb-6"><Marquee /></div>
+          </header>
+
+          <main className="mx-auto max-w-6xl px-4 pb-24">
+            <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
+              <div className="lg:col-span-3 p-4 md:p-6 rounded-3xl bg-white/[0.04] backdrop-blur border border-white/10 shadow-[0_10px_40px_rgba(34,197,94,0.15)]">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">Top Times</h2>
+                  <span className="text-xs text-white/50">auto-sorted • lower is better</span>
+                </div>
+                <ol className="mt-4 divide-y divide-white/10">
+                  {sorted.map((e, i) => (
+                    <li key={`${e.name}-${i}`} className="flex items-center justify-between py-3 rounded-xl px-2 transition hover:bg-white/5">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <RankBadge i={i} />
+                        <button onClick={() => setFeaturedIndex(i)} className="text-left truncate hover:underline">
+                          <span className="font-medium">{e.name}</span>
+                          <span className="ml-2 text-xs text-white/50 hidden sm:inline">
+                            {new URL(e.link || "https://example.com").hostname.replace("www.","")}
+                          </span>
+                        </button>
+                      </div>
+                      <span className="tabular-nums font-mono text-lg">{formatMs(e.ms)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <div className="lg:col-span-2 p-4 md:p-6 rounded-3xl bg-white/[0.04] backdrop-blur border border-white/10 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-tr from-lime-400/30 to-pink-500/30 blur-2xl" />
+                <h2 className="text-xl font-semibold">Featured Clip</h2>
+                <div className="mt-4 aspect-video w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40">
+                  {featured ? renderVideoEmbed(featured.link) : <div className="w-full h-full flex items-center justify-center text-white/60">No submission selected</div>}
+                </div>
+                {featured && (
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{featured.name}</p>
+                      <p className="text-xs text-white/60 truncate">{featured.link}</p>
+                    </div>
+                    <span className="text-sm font-mono tabular-nums bg-white/10 px-2 py-1 rounded-md">{formatMs(featured.ms)}</span>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            <section id="submit" className="mt-10 p-4 md:p-6 rounded-3xl bg-white/[0.04] backdrop-blur border border-white/10 relative">
+              {/* simple confetti burst */}
+              {/* (kept super light; emojis animate via Tailwind) */}
+              {false && <div />}{/* placeholder if you want to turn off later */}
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg md:text-xl font-semibold">Submit Your Time</h3>
+                <span className="text-xs text-white/60">Demo stores locally</span>
+              </div>
+              <form onSubmit={onSubmit} className="mt-5 grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div className="md:col-span-3">
+                  <label className="block text-sm text-white/70 mb-1">Name</label>
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name"
+                         className="w-full rounded-xl bg-white/10 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-lime-400/60" />
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-sm text-white/70 mb-1">Time</label>
+                  <input value={timeInput} onChange={(e) => setTimeInput(e.target.value)} placeholder="mm:ss.fff or seconds"
+                         className="w-full rounded-xl bg-white/10 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-lime-400/60 font-mono" />
+                </div>
+                <div className="md:col-span-6">
+                  <label className="block text-sm text-white/70 mb-1">Video Link (Instagram, TikTok, X, YouTube, Vimeo, or .mp4)</label>
+                  <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://instagram.com/..."
+                         className="w-full rounded-xl bg-white/10 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-lime-400/60" />
+                </div>
+                <div className="md:col-span-12 flex flex-wrap items-center gap-3">
+                  <button type="submit"
+                          className="rounded-xl px-5 py-2.5 font-semibold bg-gradient-to-r from-lime-400 via-emerald-400 to-pink-500 shadow-[0_10px_30px_rgba(132,204,22,0.35)] hover:scale-[1.02] hover:shadow-[0_12px_36px_rgba(236,72,153,0.45)] transition">
+                    Submit
+                  </button>
+                  <span className="text-xs text-white/60">By posting, you agree we can display your name + link.</span>
+                </div>
+              </form>
+              <p className="mt-4 text-xs text-white/60">
+                Pro tip: Paste raw seconds like <span className="font-mono">41.82</span> or formatted like <span className="font-mono">01:02.450</span>.
+                We auto-embed YouTube/Vimeo; socials open in a new tab.
+              </p>
+            </section>
+
+            <footer className="relative mt-12 py-10">
+              <div className="mx-auto max-w-6xl px-4">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur p-6 flex flex-col md:flex-row items-center justify-between gap-4 overflow-hidden">
+                  <div>
+                    <h4 className="text-lg font-semibold">Wire it up like a real SAAS?</h4>
+                    <p className="text-white/70 text-sm mt-1 max-w-xl">
+                      I can push this to a Google Sheet or your backend for real submissions, add admin moderation, and build an API for embeds.
+                    </p>
+                  </div>
+                  <a href="#submit" className="rounded-xl px-5 py-2.5 font-semibold bg-gradient-to-r from-lime-400 via-emerald-400 to-pink-500 shadow-[0_10px_30px_rgba(132,204,22,0.35)] hover:opacity-95 transition">
+                    Start Now
+                  </a>
+                </div>
+              </div>
+            </footer>
+          </main>
+        </div>
+      );
+    }
+
+    // Mount
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<DrippyRubixLeaderboard />);
+  </script>
+</body>
+</html>
